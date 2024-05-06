@@ -1,6 +1,5 @@
 import unittest
 from textnode import TextNode
-from htmlnode import LeafNode
 
 
 class TestTextNode(unittest.TestCase):
@@ -60,6 +59,54 @@ class TestTextNode(unittest.TestCase):
         self.assertEqual(leaf_node.tag, "img")
         self.assertEqual(leaf_node.value, "")
         self.assertEqual(leaf_node.props, {"src": "https://example.com", "alt": ""})
+
+    def test_split_nodes_delimiter_code(self):
+        node = TextNode("This is text with a `code block` word", "text")
+        self.assertEqual(
+            node.split_nodes_delimiter([node], "`", "code"),
+            [
+                TextNode("This is text with a ", "text"),
+                TextNode("code block", "code"),
+                TextNode(" word", "text"),
+            ],
+        )
+
+    def test_split_nodes_delimiter_bold(self):
+        node = TextNode("This is text with a *bold* word", "text")
+        self.assertEqual(
+            node.split_nodes_delimiter([node], "*", "bold"),
+            [
+                TextNode("This is text with a ", "text"),
+                TextNode("bold", "bold"),
+                TextNode(" word", "text"),
+            ],
+        )
+
+    def test_split_nodes_delimiter_italic(self):
+        node = TextNode("This is text with a **italic** word", "text")
+        self.assertEqual(
+            node.split_nodes_delimiter([node], "**", "italic"),
+            [
+                TextNode("This is text with a ", "text"),
+                TextNode("italic", "italic"),
+                TextNode(" word", "text"),
+            ],
+        )
+
+    def test_split_nodes_delimiter_non_text_type(self):
+        nodes = [
+            TextNode("This is text with a *bold* word", "text"),
+            TextNode("This is a non text type node", "code"),
+        ]
+        self.assertEqual(
+            TextNode.split_nodes_delimiter(self, nodes, "*", "bold"),
+            [
+                TextNode("This is text with a ", "text"),
+                TextNode("bold", "bold"),
+                TextNode(" word", "text"),
+                TextNode("This is a non text type node", "code"),
+            ],
+        )
 
 
 if __name__ == "__main__":
