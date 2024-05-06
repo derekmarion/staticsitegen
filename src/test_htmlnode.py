@@ -55,6 +55,78 @@ class TestParentNode(unittest.TestCase):
             "<p><b>Bold text</b>Normal text<i>italic text</i>Normal text</p>",
         )
 
+    def test_to_html_with_props(self):
+        parentnode = ParentNode(
+            "p",
+            [
+                LeafNode("b", "Bold text"),
+                LeafNode(None, "Normal text"),
+                LeafNode("i", "italic text"),
+                LeafNode(None, "Normal text"),
+            ],
+            {"class": "some_css"},
+        )
+
+        self.assertEqual(
+            parentnode.to_html(),
+            '<p class="some_css"><b>Bold text</b>Normal text<i>italic text</i>Normal text</p>',
+        )
+
+    def test_parent_in_parent(self):
+        parentnode = ParentNode(
+            "h1",
+            [
+                ParentNode(
+                    "p",
+                    [
+                        LeafNode("b", "Bold text"),
+                        LeafNode(None, "Normal text"),
+                        LeafNode("i", "italic text"),
+                        LeafNode(None, "Normal text"),
+                    ],
+                )
+            ],
+        )
+        self.assertEqual(
+            parentnode.to_html(),
+            "<h1><p><b>Bold text</b>Normal text<i>italic text</i>Normal text</p></h1>",
+        )
+
+    def test_parent_in_parent_in_parent(self):
+        parentnode = ParentNode(
+            "title",
+            [
+                ParentNode(
+                    "h1",
+                    [
+                        ParentNode(
+                            "p",
+                            [
+                                LeafNode("b", "Bold text"),
+                                LeafNode(None, "Normal text"),
+                                LeafNode("i", "italic text"),
+                                LeafNode(None, "Normal text"),
+                            ],
+                        )
+                    ],
+                ),
+            ],
+        )
+        self.assertEqual(
+            parentnode.to_html(),
+            "<title><h1><p><b>Bold text</b>Normal text<i>italic text</i>Normal text</p></h1></title>",
+        )
+
+    def test_no_tag(self):
+        with self.assertRaises(ValueError):
+            parentnode = ParentNode(None, LeafNode("b", "Bold text"))
+            parentnode.to_html()
+
+    def test_no_children(self):
+        with self.assertRaises(ValueError):
+            parentnode = ParentNode("p", None)
+            parentnode.to_html()
+
 
 if __name__ == "__main__":
     unittest.main()
