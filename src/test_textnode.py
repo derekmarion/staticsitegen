@@ -1,5 +1,5 @@
 import unittest
-from textnode import TextNode
+from textnode import TextNode, split_nodes_delimiter
 
 
 class TestTextNode(unittest.TestCase):
@@ -63,7 +63,7 @@ class TestTextNode(unittest.TestCase):
     def test_split_nodes_delimiter_code(self):
         node = TextNode("This is text with a `code block` word", "text")
         self.assertEqual(
-            node.split_nodes_delimiter([node], "`", "code"),
+            split_nodes_delimiter([node], "`", "code"),
             [
                 TextNode("This is text with a ", "text"),
                 TextNode("code block", "code"),
@@ -74,7 +74,7 @@ class TestTextNode(unittest.TestCase):
     def test_split_nodes_delimiter_bold(self):
         node = TextNode("This is text with a *bold* word", "text")
         self.assertEqual(
-            node.split_nodes_delimiter([node], "*", "bold"),
+            split_nodes_delimiter([node], "*", "bold"),
             [
                 TextNode("This is text with a ", "text"),
                 TextNode("bold", "bold"),
@@ -85,7 +85,7 @@ class TestTextNode(unittest.TestCase):
     def test_split_nodes_delimiter_italic(self):
         node = TextNode("This is text with a **italic** word", "text")
         self.assertEqual(
-            node.split_nodes_delimiter([node], "**", "italic"),
+            split_nodes_delimiter([node], "**", "italic"),
             [
                 TextNode("This is text with a ", "text"),
                 TextNode("italic", "italic"),
@@ -99,7 +99,7 @@ class TestTextNode(unittest.TestCase):
             TextNode("This is a non text type node", "code"),
         ]
         self.assertEqual(
-            TextNode.split_nodes_delimiter(self, nodes, "*", "bold"),
+            split_nodes_delimiter(nodes, "*", "bold"),
             [
                 TextNode("This is text with a ", "text"),
                 TextNode("bold", "bold"),
