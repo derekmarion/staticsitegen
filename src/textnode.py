@@ -1,4 +1,5 @@
 from htmlnode import LeafNode
+import re
 
 
 class TextNode:
@@ -47,21 +48,31 @@ class TextNode:
 
         kwargs = types[self.text_type]
         return LeafNode(**kwargs)
-    
-    def split_nodes_delimiter(self, old_nodes, delimiter, text_type):
-        new_nodes = []
-        for node in old_nodes:
-            if node.text_type != TextNode.text_type_text:
-                new_nodes.append(node)
-                continue
-            if node.text.count(delimiter) % 2 != 0:
-                raise Exception("Input nodes have bad Markdown syntax")
-            else:
-                split_nodes = node.text.split(delimiter)
-                for idx, string in enumerate(split_nodes):
-                    if idx == 1:
-                        new_nodes.append(TextNode(string, text_type))
-                    else:
-                        new_nodes.append(TextNode(string, TextNode.text_type_text))
-        return new_nodes
 
+
+def split_nodes_delimiter(old_nodes, delimiter, text_type):
+    new_nodes = []
+    for node in old_nodes:
+        if node.text_type != TextNode.text_type_text:
+            new_nodes.append(node)
+            continue
+        if node.text.count(delimiter) % 2 != 0:
+            raise Exception("Input nodes have bad Markdown syntax")
+        else:
+            split_nodes = node.text.split(delimiter)
+            for idx, string in enumerate(split_nodes):
+                if idx == 1:
+                    new_nodes.append(TextNode(string, text_type))
+                else:
+                    new_nodes.append(TextNode(string, TextNode.text_type_text))
+    return new_nodes
+
+
+def extract_markdown_images(text):
+    matches = re.findall(r"!\[(.*?)\]\((.*?)\)", text)
+    return matches
+
+
+def extract_markdown_links(text):
+    matches = re.findall(r"\[(.*?)\]\((.*?)\)", text)
+    return matches

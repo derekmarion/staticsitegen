@@ -1,5 +1,10 @@
 import unittest
-from textnode import TextNode, split_nodes_delimiter
+from textnode import (
+    TextNode,
+    split_nodes_delimiter,
+    extract_markdown_images,
+    extract_markdown_links,
+)
 
 
 class TestTextNode(unittest.TestCase):
@@ -60,6 +65,8 @@ class TestTextNode(unittest.TestCase):
         self.assertEqual(leaf_node.value, "")
         self.assertEqual(leaf_node.props, {"src": "https://example.com", "alt": ""})
 
+
+class TestSplitNodesDelimiter(unittest.TestCase):
     def test_split_nodes_delimiter_code(self):
         node = TextNode("This is text with a `code block` word", "text")
         self.assertEqual(
@@ -105,6 +112,34 @@ class TestTextNode(unittest.TestCase):
                 TextNode("bold", "bold"),
                 TextNode(" word", "text"),
                 TextNode("This is a non text type node", "code"),
+            ],
+        )
+
+
+class TestExtractMarkdown(unittest.TestCase):
+    def test_extract_markdown_images(self):
+        text = "This is text with an ![image](https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/zjjcJKZ.png) and ![another](https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/dfsdkjfd.png)"
+        self.assertEqual(
+            extract_markdown_images(text),
+            [
+                (
+                    "image",
+                    "https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/zjjcJKZ.png",
+                ),
+                (
+                    "another",
+                    "https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/dfsdkjfd.png",
+                ),
+            ],
+        )
+
+    def test_extract_markdown_links(self):
+        text = "This is text with a [link](https://www.example.com) and [another](https://www.example.com/another)"
+        self.assertEqual(
+            extract_markdown_links(text),
+            [
+                ("link", "https://www.example.com"),
+                ("another", "https://www.example.com/another"),
             ],
         )
 
