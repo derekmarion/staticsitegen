@@ -90,6 +90,27 @@ def split_nodes_image(old_nodes):
     return new_nodes
 
 
+def split_nodes_link(old_nodes):
+    new_nodes = []
+    for node in old_nodes:
+        if node.text == "":
+            continue
+        link_strings = extract_markdown_links(node.text)
+        text = node.text
+        for link_tup in link_strings:
+            split_string = text.split(f"[{link_tup[0]}]({link_tup[1]})", 1)
+            for idx, string in enumerate(split_string):
+                if idx == 0:
+                    new_nodes.append(TextNode(string, TextNode.text_type_text))
+                    new_nodes.append(
+                        TextNode(link_tup[0], TextNode.text_type_image, link_tup[1])
+                    )
+                elif idx == 1:
+                    text = string
+
+    return new_nodes
+
+
 def extract_markdown_images(text):
     matches = re.findall(r"!\[(.*?)\]\((.*?)\)", text)
     return matches

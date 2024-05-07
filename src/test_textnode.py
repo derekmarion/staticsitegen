@@ -5,6 +5,7 @@ from textnode import (
     extract_markdown_images,
     extract_markdown_links,
     split_nodes_image,
+    split_nodes_link,
 )
 
 
@@ -146,6 +147,7 @@ class TestExtractMarkdown(unittest.TestCase):
 
 
 class TestSplitNodesImage(unittest.TestCase):
+    # need to test multiple nodes passed in
     def test_split_nodes_image_multiple(self):
         node = TextNode(
             "This is text with an ![image](https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/zjjcJKZ.png) and another ![second image](https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/3elNhQu.png)",
@@ -169,7 +171,7 @@ class TestSplitNodesImage(unittest.TestCase):
                 ),
             ],
         )
-    
+
     def test_split_nodes_image_single(self):
         node = TextNode(
             "This is text with an ![image](https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/zjjcJKZ.png)",
@@ -182,6 +184,50 @@ class TestSplitNodesImage(unittest.TestCase):
                 TextNode("This is text with an ", TextNode.text_type_text),
                 TextNode(
                     "image",
+                    TextNode.text_type_image,
+                    "https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/zjjcJKZ.png",
+                ),
+            ],
+        )
+
+
+class TestSplitNodesLink(unittest.TestCase):
+    def test_split_nodes_link_multiple(self):
+        node = TextNode(
+            "This is text with a [link](https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/zjjcJKZ.png) and another [second link](https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/3elNhQu.png)",
+            TextNode.text_type_text,
+        )
+        new_nodes = split_nodes_link([node])
+        self.assertEqual(
+            new_nodes,
+            [
+                TextNode("This is text with a ", TextNode.text_type_text),
+                TextNode(
+                    "link",
+                    TextNode.text_type_image,
+                    "https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/zjjcJKZ.png",
+                ),
+                TextNode(" and another ", TextNode.text_type_text),
+                TextNode(
+                    "second link",
+                    TextNode.text_type_image,
+                    "https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/3elNhQu.png",
+                ),
+            ],
+        )
+
+    def test_split_nodes_link_single(self):
+        node = TextNode(
+            "This is text with a [link](https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/zjjcJKZ.png)",
+            TextNode.text_type_text,
+        )
+        new_nodes = split_nodes_link([node])
+        self.assertEqual(
+            new_nodes,
+            [
+                TextNode("This is text with a ", TextNode.text_type_text),
+                TextNode(
+                    "link",
                     TextNode.text_type_image,
                     "https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/zjjcJKZ.png",
                 ),
