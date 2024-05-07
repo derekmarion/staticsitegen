@@ -118,7 +118,9 @@ def split_nodes_link(old_nodes):
                         if idx == 0:
                             new_nodes.append(TextNode(string, TextNode.text_type_text))
                             new_nodes.append(
-                                TextNode(link_tup[0], TextNode.text_type_link, link_tup[1])
+                                TextNode(
+                                    link_tup[0], TextNode.text_type_link, link_tup[1]
+                                )
                             )
                         elif idx == len(split_string) - 1:
                             text = string
@@ -152,3 +154,10 @@ def extract_markdown_images(text):
 def extract_markdown_links(text):
     matches = re.findall(r"\[(.*?)\]\((.*?)\)", text)
     return matches
+
+
+def markdown_to_blocks(markdown):
+    blocks = re.split(r"\n[ \t]*\n", markdown)
+    for idx, block in enumerate(blocks):
+        blocks[idx] = block.strip()
+    return blocks
