@@ -7,6 +7,7 @@ class TextNode:
     text_type_code = "code"
     text_type_bold = "bold"
     text_type_italic = "italic"
+    text_type_image = "image"
 
     def __init__(self, text, text_type, url=None):
         self.text = text
@@ -59,12 +60,33 @@ def split_nodes_delimiter(old_nodes, delimiter, text_type):
         if node.text.count(delimiter) % 2 != 0:
             raise Exception("Input nodes have bad Markdown syntax")
         else:
-            split_nodes = node.text.split(delimiter)
-            for idx, string in enumerate(split_nodes):
+            split_string = node.text.split(delimiter)
+            for idx, string in enumerate(split_string):
                 if idx == 1:
                     new_nodes.append(TextNode(string, text_type))
                 else:
                     new_nodes.append(TextNode(string, TextNode.text_type_text))
+    return new_nodes
+
+
+def split_nodes_image(old_nodes):
+    new_nodes = []
+    for node in old_nodes:
+        if node.text == "":
+            continue
+        image_strings = extract_markdown_images(node.text)
+        text = node.text
+        for image_tup in image_strings:
+            split_string = text.split(f"![{image_tup[0]}]({image_tup[1]})", 1)
+            for idx, string in enumerate(split_string):
+                if idx == 0:
+                    new_nodes.append(TextNode(string, TextNode.text_type_text))
+                    new_nodes.append(
+                        TextNode(image_tup[0], TextNode.text_type_image, image_tup[1])
+                    )
+                elif idx == 1:
+                    text = string
+
     return new_nodes
 
 
