@@ -6,6 +6,7 @@ from textnode import (
     extract_markdown_links,
     split_nodes_image,
     split_nodes_link,
+    text_to_textnodes,
 )
 
 
@@ -190,6 +191,25 @@ class TestSplitNodesImage(unittest.TestCase):
             ],
         )
 
+    def test_split_nodes_image_single_with_ending_node(self):
+        node = TextNode(
+            "This is text with an ![image](https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/zjjcJKZ.png) and some additional text",
+            TextNode.text_type_text,
+        )
+        new_nodes = split_nodes_image([node])
+        self.assertEqual(
+            new_nodes,
+            [
+                TextNode("This is text with an ", TextNode.text_type_text),
+                TextNode(
+                    "image",
+                    TextNode.text_type_image,
+                    "https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/zjjcJKZ.png",
+                ),
+                TextNode(" and some additional text", TextNode.text_type_text),
+            ],
+        )
+
 
 class TestSplitNodesLink(unittest.TestCase):
     def test_split_nodes_link_multiple(self):
@@ -204,13 +224,13 @@ class TestSplitNodesLink(unittest.TestCase):
                 TextNode("This is text with a ", TextNode.text_type_text),
                 TextNode(
                     "link",
-                    TextNode.text_type_image,
+                    TextNode.text_type_link,
                     "https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/zjjcJKZ.png",
                 ),
                 TextNode(" and another ", TextNode.text_type_text),
                 TextNode(
                     "second link",
-                    TextNode.text_type_image,
+                    TextNode.text_type_link,
                     "https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/3elNhQu.png",
                 ),
             ],
@@ -228,9 +248,53 @@ class TestSplitNodesLink(unittest.TestCase):
                 TextNode("This is text with a ", TextNode.text_type_text),
                 TextNode(
                     "link",
+                    TextNode.text_type_link,
+                    "https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/zjjcJKZ.png",
+                ),
+            ],
+        )
+
+    def test_split_nodes_link_single_with_ending_node(self):
+        node = TextNode(
+            "This is text with a [link](https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/zjjcJKZ.png) and some additional text",
+            TextNode.text_type_text,
+        )
+        new_nodes = split_nodes_link([node])
+        self.assertEqual(
+            new_nodes,
+            [
+                TextNode("This is text with a ", TextNode.text_type_text),
+                TextNode(
+                    "link",
+                    TextNode.text_type_link,
+                    "https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/zjjcJKZ.png",
+                ),
+                TextNode(" and some additional text", TextNode.text_type_text),
+            ],
+        )
+
+
+class TestTextToTextNodes(unittest.TestCase):
+    def test_text_to_textnodes(self):
+        text = "This is **text** with an *italic* word and a `code block` and an ![image](https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/zjjcJKZ.png) and a [link](https://boot.dev)"
+        new_nodes = text_to_textnodes(text)
+        self.assertEqual(
+            new_nodes,
+            [
+                TextNode("This is ", TextNode.text_type_text),
+                TextNode("text", TextNode.text_type_bold),
+                TextNode(" with an ", TextNode.text_type_text),
+                TextNode("italic", TextNode.text_type_italic),
+                TextNode(" word and a ", TextNode.text_type_text),
+                TextNode("code block", TextNode.text_type_code),
+                TextNode(" and an ", TextNode.text_type_text),
+                TextNode(
+                    "image",
                     TextNode.text_type_image,
                     "https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/zjjcJKZ.png",
                 ),
+                TextNode(" and a ", TextNode.text_type_text),
+                TextNode("link", TextNode.text_type_link, "https://boot.dev"),
             ],
         )
 

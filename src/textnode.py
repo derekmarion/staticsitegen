@@ -8,6 +8,7 @@ class TextNode:
     text_type_bold = "bold"
     text_type_italic = "italic"
     text_type_image = "image"
+    text_type_link = "link"
 
     def __init__(self, text, text_type, url=None):
         self.text = text
@@ -74,18 +75,28 @@ def split_nodes_image(old_nodes):
     for node in old_nodes:
         if node.text == "":
             continue
-        image_strings = extract_markdown_images(node.text)
-        text = node.text
-        for image_tup in image_strings:
-            split_string = text.split(f"![{image_tup[0]}]({image_tup[1]})", 1)
-            for idx, string in enumerate(split_string):
-                if idx == 0:
-                    new_nodes.append(TextNode(string, TextNode.text_type_text))
-                    new_nodes.append(
-                        TextNode(image_tup[0], TextNode.text_type_image, image_tup[1])
-                    )
-                elif idx == 1:
-                    text = string
+        if node.text_type != TextNode.text_type_text:
+            new_nodes.append(node)
+        else:
+            image_strings = extract_markdown_images(node.text)
+            text = node.text
+            if len(image_strings) > 0:
+                for image_tup in image_strings:
+                    split_string = text.split(f"![{image_tup[0]}]({image_tup[1]})", 1)
+                    for idx, string in enumerate(split_string):
+                        if idx == 0:
+                            new_nodes.append(TextNode(string, TextNode.text_type_text))
+                            new_nodes.append(
+                                TextNode(
+                                    image_tup[0], TextNode.text_type_image, image_tup[1]
+                                )
+                            )
+                        elif idx == len(split_string) - 1:
+                            text = string
+                if text != "":
+                    new_nodes.append(TextNode(text, TextNode.text_type_text))
+            else:
+                new_nodes.append(node)
 
     return new_nodes
 
@@ -95,20 +106,42 @@ def split_nodes_link(old_nodes):
     for node in old_nodes:
         if node.text == "":
             continue
-        link_strings = extract_markdown_links(node.text)
-        text = node.text
-        for link_tup in link_strings:
-            split_string = text.split(f"[{link_tup[0]}]({link_tup[1]})", 1)
-            for idx, string in enumerate(split_string):
-                if idx == 0:
-                    new_nodes.append(TextNode(string, TextNode.text_type_text))
-                    new_nodes.append(
-                        TextNode(link_tup[0], TextNode.text_type_image, link_tup[1])
-                    )
-                elif idx == 1:
-                    text = string
+        if node.text_type != TextNode.text_type_text:
+            new_nodes.append(node)
+        else:
+            link_strings = extract_markdown_links(node.text)
+            text = node.text
+            if len(link_strings) > 0:
+                for link_tup in link_strings:
+                    split_string = text.split(f"[{link_tup[0]}]({link_tup[1]})", 1)
+                    for idx, string in enumerate(split_string):
+                        if idx == 0:
+                            new_nodes.append(TextNode(string, TextNode.text_type_text))
+                            new_nodes.append(
+                                TextNode(link_tup[0], TextNode.text_type_link, link_tup[1])
+                            )
+                        elif idx == len(split_string) - 1:
+                            text = string
+                if text != "":
+                    new_nodes.append(TextNode(text, TextNode.text_type_text))
+            else:
+                new_nodes.append(node)
 
     return new_nodes
+
+
+def text_to_textnodes(text):
+    node = TextNode(text, TextNode.text_type_text)
+    extracted_nodes = split_nodes_delimiter([node], "`", TextNode.text_type_code)
+    extracted_nodes = split_nodes_delimiter(
+        extracted_nodes, "**", TextNode.text_type_bold
+    )
+    extracted_nodes = split_nodes_delimiter(
+        extracted_nodes, "*", TextNode.text_type_italic
+    )
+    extracted_nodes = split_nodes_image(extracted_nodes)
+    extracted_nodes = split_nodes_link(extracted_nodes)
+    return extracted_nodes
 
 
 def extract_markdown_images(text):
