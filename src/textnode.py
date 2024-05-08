@@ -1,3 +1,12 @@
+from constants import (
+    BLOCK_TYPE_PARAGRAPH,
+    BLOCK_TYPE_CODE,
+    BLOCK_TYPE_HEADING,
+    BLOCK_TYPE_ORDERED_LIST,
+    BLOCK_TYPE_QUOTE,
+    BLOCK_TYPE_UNORDERED_LIST,
+    heading_pattern,
+)
 from htmlnode import LeafNode
 import re
 
@@ -161,3 +170,29 @@ def markdown_to_blocks(markdown):
     for idx, block in enumerate(blocks):
         blocks[idx] = block.strip()
     return blocks
+
+
+def block_to_block_type(block):
+    if heading_pattern.search(block):
+        return BLOCK_TYPE_HEADING
+    elif block.startswith("```") and block.endswith("```"):
+        return BLOCK_TYPE_CODE
+    elif block.startswith("> "):
+        for line in block.split("\n"):
+            if not line.startswith("> "):
+                return BLOCK_TYPE_PARAGRAPH
+        return BLOCK_TYPE_QUOTE
+    elif block.startswith("* ") or block.startswith("- "):
+        for line in block.split("\n"):
+            if not line.startswith("* ") and not line.startswith("- "):
+                return BLOCK_TYPE_PARAGRAPH
+        return BLOCK_TYPE_UNORDERED_LIST
+    elif block.startswith("1. "):
+        list_count = 1
+        for line in block.split("\n"):
+            if not line.startswith(f"{str(list_count)}. "):
+                return BLOCK_TYPE_PARAGRAPH
+            list_count += 1
+        return BLOCK_TYPE_ORDERED_LIST
+    else:
+        return BLOCK_TYPE_PARAGRAPH

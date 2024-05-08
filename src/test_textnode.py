@@ -8,6 +8,15 @@ from textnode import (
     split_nodes_link,
     text_to_textnodes,
     markdown_to_blocks,
+    block_to_block_type,
+)
+from constants import (
+    BLOCK_TYPE_ORDERED_LIST,
+    BLOCK_TYPE_HEADING,
+    BLOCK_TYPE_PARAGRAPH,
+    BLOCK_TYPE_CODE,
+    BLOCK_TYPE_QUOTE,
+    BLOCK_TYPE_UNORDERED_LIST,
 )
 
 
@@ -318,6 +327,36 @@ class TestMarkdownToBlocks(unittest.TestCase):
                 "* This is a list item\n            * This is another list item",
             ],
         )
+
+
+class TestBlockToBlockType(unittest.TestCase):
+    def test_block_to_block_type_heading(self):
+        block = "# This is a heading block"
+        self.assertEqual(block_to_block_type(block), BLOCK_TYPE_HEADING)
+
+    def test_block_to_block_type_code(self):
+        block = "```This is \n some \n code```"
+        self.assertEqual(block_to_block_type(block), BLOCK_TYPE_CODE)
+
+    def test_block_to_block_type_quote(self):
+        block = "> Every line in a quote block\n> has to start with a `> ' sequence"
+        self.assertEqual(block_to_block_type(block), BLOCK_TYPE_QUOTE)
+
+    def test_block_to_block_type_not_quote(self):
+        block = "> Every line in a quote block\n has to start with a `> ' sequence"
+        self.assertEqual(block_to_block_type(block), BLOCK_TYPE_PARAGRAPH)
+
+    def test_block_to_block_type_unordered_list(self):
+        block = "- This is \n* a list\n- with multiple types of\n* bullets"
+        self.assertEqual(block_to_block_type(block), BLOCK_TYPE_UNORDERED_LIST)
+
+    def test_block_to_block_type_ordered_list(self):
+        block = "1. This is \n2. an ordered list\n3. of multiple lines"
+        self.assertEqual(block_to_block_type(block), BLOCK_TYPE_ORDERED_LIST)
+
+    def test_block_to_block_type_not_ordered_list(self):
+        block = "1. This is \n3. an ordered list\n3. that is incorrectly formatted"
+        self.assertEqual(block_to_block_type(block), BLOCK_TYPE_PARAGRAPH)
 
 
 if __name__ == "__main__":
