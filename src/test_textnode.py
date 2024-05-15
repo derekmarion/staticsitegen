@@ -339,11 +339,11 @@ class TestBlockToBlockType(unittest.TestCase):
         self.assertEqual(block_to_block_type(block), BLOCK_TYPE_CODE)
 
     def test_block_to_block_type_quote(self):
-        block = "> Every line in a quote block\n> has to start with a `> ' sequence"
+        block = "> Every line in a quote block\n> has to start with a '> ' sequence"
         self.assertEqual(block_to_block_type(block), BLOCK_TYPE_QUOTE)
 
     def test_block_to_block_type_not_quote(self):
-        block = "> Every line in a quote block\n has to start with a `> ' sequence"
+        block = "> Every line in a quote block\n has to start with a '> ' sequence"
         self.assertEqual(block_to_block_type(block), BLOCK_TYPE_PARAGRAPH)
 
     def test_block_to_block_type_unordered_list(self):
