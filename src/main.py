@@ -1,14 +1,13 @@
-from textnode import TextNode
-from htmlnode import HTMLNode
+import shutil
+import os
+from copy_static import copy_static
 
-
-def main():
-    textnode = TextNode("This is a text node", "bold", "https://example.com")
-    print(textnode)
-
-    htmlnode = HTMLNode("a", "this is a link", "children", {"href": "https://example.com"})
-    print(htmlnode)
-
+def main(): 
+    source = "/Users/derek/code/staticsitegen/static"
+    destination = "/Users/derek/code/staticsitegen/public"
+    shutil.rmtree(destination, ignore_errors=True)
+    os.mkdir(destination)
+    copy_static(source, destination)
 
 if __name__ == "__main__":
     main()
