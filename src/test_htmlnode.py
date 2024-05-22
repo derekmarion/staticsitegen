@@ -1,6 +1,19 @@
 import unittest
 
-from htmlnode import HTMLNode, LeafNode, ParentNode
+from htmlnode import (
+    HTMLNode,
+    LeafNode,
+    ParentNode,
+)
+from constants import (
+    TAG_TYPE_CODE,
+    TAG_TYPE_PREFORMATTED_TEXT,
+    TAG_TYPE_PARAGRAPH,
+    TAG_TYPE_QUOTE,
+    TAG_TYPE_LIST_ITEM,
+    TAG_TYPE_UNORDERED_LIST,
+    TAG_TYPE_ORDERED_LIST,
+)
 
 
 class TestHTMLNode(unittest.TestCase):
@@ -20,6 +33,15 @@ class TestHTMLNode(unittest.TestCase):
         self.assertEqual(
             htmlnode.props_to_html(), ' href="https://google.com" target="_blank"'
         )
+
+    def test_eq(self):
+        htmlnode1 = HTMLNode(
+            "a", "this is a link", "children", {"href": "https://example.com"}
+        )
+        htmlnode2 = HTMLNode(
+            "a", "this is a link", "children", {"href": "https://example.com"}
+        )
+        self.assertEqual(htmlnode1.__eq__(htmlnode2), True)
 
 
 class TestLeafNode(unittest.TestCase):
