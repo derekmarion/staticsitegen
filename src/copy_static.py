@@ -10,7 +10,7 @@ def copy_static(source, destination):
         full_path = os.path.join(source, item)
         if os.path.isfile(full_path):
             # Copy file to destination, this is the base case
-            print(f"Copying {full_path} to {destination}")
+            print(f"Copying static file {full_path} to {destination}")
             shutil.copy(full_path, destination)
         else:
             # If item is a folder, create it at destination
@@ -18,4 +18,3 @@ def copy_static(source, destination):
             os.mkdir(new_destination_folder)
             # Make recursive call on folder item with dest folder you just created
             copy_static(full_path, new_destination_folder)
-
